@@ -1,0 +1,7 @@
+.vscode
+.DS_Store
+/build*
+/docs
+/yaml
+/yaml*.tar.gz
+/result*
