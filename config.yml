@@ -1,0 +1,18 @@
+tic_settings: # required header for load_config fcn.
+    product: TIC_PRODUCT_T500
+    auto_clear_driver_error: True
+    ignore_err_line_high: True
+    serial_crc_enabled: False
+    command_timeout: 0
+    max_speed: 200000000 # pulses/s * 10^-4
+    starting_speed: 0 # pulses/s * 10^-4
+    max_accel: 40000 # pulses/s^2 * 10^-2
+    max_decel: 40000 # pulses/s^2 * 10^-2
+    step_mode: TIC_STEP_MODE_FULL
+    current_limit: 640 # mA, Only select values acceptable, See notes.
+    decay_mode: TIC_DECAY_MODE_T500_AUTO
+    pin_settings: # Ex. Modifying Default Pin Fcn.
+        - pin_num: TIC_PIN_NUM_RX
+          func: TIC_PIN_FUNC_USER_INPUT
+          pullup: True
+          analog: False
