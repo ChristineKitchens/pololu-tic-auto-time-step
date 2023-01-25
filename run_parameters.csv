@@ -1,0 +1,5 @@
+total_time,target_velocities,holding_time
+2,0,60
+2,500000,60
+2,1000000,60
+2,2000000,60
