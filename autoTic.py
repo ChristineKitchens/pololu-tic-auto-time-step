@@ -1,4 +1,8 @@
+import libusb_package
 from ticlib import TicUSB
+
+for dev in libusb_package.find(find_all=True):
+    print(dev)
 
 tic = TicUSB(product='TIC_500')
 
