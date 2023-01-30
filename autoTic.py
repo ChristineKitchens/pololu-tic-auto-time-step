@@ -1,10 +1,11 @@
 import csv
 from datetime import datetime
+import libusb_package
 import os
-import pytic
 import signal
 import sys
 import readchar
+from ticlib import TicUSB
 import time
 
 # - Functions ------------------------------------------------
@@ -68,7 +69,8 @@ def get_target_velocities():
 
     while True:
         try:
-            velocity_input = input('Enter target velocities (pulses/ 10,000 seconds): \n '
+            velocity_input = input('Enter target velocities (microsteps/ 10,000 seconds): \n '
+
                                    'Please enter a list separated by a space \n')
 
             velocity_list = velocity_input.split()
@@ -139,15 +141,12 @@ signal.signal(signal.SIGINT, handler)
 
 # - Initialization -------------------------------------------
 
-tic = pytic.PyTic()
+for dev in libusb_package.find(find_all=True):
+    print(dev)
 
-# Connect to first available Tic Device serial number over USB
-serialNums = tic.list_connected_device_serial_numbers()
-tic.connect_to_serial_number(serial_number=serialNums[0])
 
-# Load configuration file and apply settings
-tic.settings.load_config("config.yml")
-tic.settings.apply()
+tic = TicUSB()
+
 
 # - Configure Run Parameters ---------------------------------
 
@@ -178,6 +177,9 @@ while True:
 
 # - Commence Run ---------------------------------------------
 
+# Zero current motor position
+tic.halt_and_set_position(0)
+
 # Energize Motor
 start()
 
@@ -202,8 +204,9 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
     output_writer = csv.writer(output_file, delimiter='\t')
     output_writer.writerow([f'Date: {current_time()}'])
     output_writer.writerow([f'User: {os.getlogin()}'])
-    output_writer.writerow([f'Tic Device: {tic.settings.product}'])
-    output_writer.writerow([f'Tic Serial Number: {serialNums[0]}'])
+    output_writer.writerow([f'Tic Device: TIC-T500'])
+    output_writer.writerow([f'Tic Serial Number: 00387558'])
+
     output_writer.writerow(
         [f'Target Velocities: {list(velocity_col.values())}'])
     output_writer.writerow([f'Holding Times: {list(holding_col.values())}'])
@@ -216,11 +219,12 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
     # Iterate through list of target velocities
     for key, value in velocity_col.items():
         for i in value:
-            tic.set_target_velocity(int(i))
+            tic.set_target_velocity(i)
             holding_time = int(holding_col['holding_time'][counter])
             counter += 1
             # Maintain current velocity for pre-determined holding time
-            while tic.variables.current_velocity != tic.variables.target_velocity:
+            while tic.get_current_velocity() != tic.get_target_velocity():
+
                 for t in range(holding_time, 0, -1):
                     time.sleep(1)
                     sys.stdout.write(
@@ -229,7 +233,8 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
                     sys.stdout.flush()
                     # Write current time and velocity to output file
                     output_writer.writerow(
-                        [f'{current_time()}', f'{tic.variables.current_velocity}'])
+                        [f'{current_time()}', f'{tic.get_current_velocity()}'])
+
 
     # De-energize motor and get error status
     while True:
