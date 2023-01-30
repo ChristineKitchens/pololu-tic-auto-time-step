@@ -201,8 +201,8 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
     output_writer = csv.writer(output_file, delimiter='\t')
     output_writer.writerow([f'Date: {current_time()}'])
     output_writer.writerow([f'User: {os.getlogin()}'])
-    output_writer.writerow([f'Tic Device: '])
-    output_writer.writerow([f'Tic Serial Number:'])
+    output_writer.writerow([f'Tic Device: TIC-T500'])
+    output_writer.writerow([f'Tic Serial Number: 00387558'])
     output_writer.writerow(
         [f'Target Velocities: {list(velocity_col.values())}'])
     output_writer.writerow([f'Holding Times: {list(holding_col.values())}'])

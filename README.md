@@ -2,28 +2,19 @@
 Script that automates incremental increases in velocity based on user inputs. This program builds upon scripts in the [Pololu-Tic-Software Github](https://github.com/pololu/pololu-tic-software) and [ticlib Github](https://github.com/jphalip/ticlib).
 
 # Prerequisites
-Requires [Tic Software and Drivers for Windows](https://www.pololu.com/file/0J1325/pololu-tic-1.8.2-win.msi) provided by Pololu to be installed. Also requires installation of [ticlib Python wrapper](https://github.com/jphalip/ticlib). Install the libtic package and other dependencies using the following script:
+Requires [Tic Software and Drivers for Windows](https://www.pololu.com/file/0J1325/pololu-tic-1.8.2-win.msi) provided by Pololu to be installed. Also requires installation of [ticlib Python wrapper](https://github.com/jphalip/ticlib). Navigate to the directory containing the repo and install the dependencies using the following command:
 
 ```
-C:\> pip install pytic
-C:\> pip install csv
-C:\> pip install datetime
-C:\> pip install libusb_package
-C:\> pip install os
-C:\> pip install signal
-C:\> pip install sys
-C:\> pip install readchar
-C:\> pip install ticlib
-C:\> pip install time
+pip install -r requirements.txt
 ```
 # Script Use
 ## 1. Update Settings via Pololu Tic Control Center
 Before running [autoTic.py](autoTic.py), open the Pololu Tic Control Center on the desktop. Navigate through the tabs and update the settings according to the product being used. For more details on settings and recommendations for given products, see the [Pololu Tic Manual](https://www.pololu.com/docs/0J71), Section 6 Setting Reference.
 
 <p align="center">
-  <img src="resources/tic_control_center1.png" width="500" />
-  <img src="resources/tic_control_center2.png" width="500" /> 
-  <img src="resources/tic_control_center3.png" width="500" />
+  <img src="resources/tic_control_center1.png" />
+  <img src="resources/tic_control_center2.png" /> 
+  <img src="resources/tic_control_center3.png" />
 </p>
 
 After making any changes, make sure to click "Apply Settings" in the lower right-hand corner of the screen.
@@ -84,7 +75,7 @@ Once the holding time ends for the last specified velocity, the impellar will co
 ```
 Entering Y will shutdown the motor and exit the program. Again, note that pressing `Ctrl + C` at any time will shutdown the motor and exit the program.
 
-The generated .txt file should look similar to the example file in this repo:
+The generated .txt file should look similar to the [example](sediment%20experiment%20core%20C%202023-01-30.txt) file in this repo:
 
 ![output_file.png](resources/output_file.png)
 
