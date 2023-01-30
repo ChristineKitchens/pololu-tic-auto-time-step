@@ -69,7 +69,7 @@ def get_target_velocities():
 
     while True:
         try:
-            velocity_input = input('Enter target velocities (microsteps/ 10,000 seconds): \n '
+            velocity_input = input('Enter target velocities (microsteps/ 10,000 seconds): \n'
 
                                    'Please enter a list separated by a space \n')
 
@@ -95,7 +95,7 @@ def get_holding_times():
 
     while True:
         try:
-            holding_input = input('Holding times for target velocities (secs): \n '
+            holding_input = input('Holding times for target velocities (secs): \n'
                                   'Please enter a list separated by a space \n')
 
             holding_list = holding_input.split()
@@ -234,7 +234,6 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
                     # Write current time and velocity to output file
                     output_writer.writerow(
                         [f'{current_time()}', f'{tic.get_current_velocity()}'])
-
 
     # De-energize motor and get error status
     while True:
