@@ -46,7 +46,7 @@ def load_settings():
         for record in reader:
             velocity_col['target_velocities'].append(
                 int(record['target_velocities']))
-            holding_col['holding_time'].append(float(record['holding_time']))
+            holding_col['holding_time'].append(int(record['holding_time']))
 
     print(f'Target Velocities: {velocity_col.values()}')
     print(f'Holding Times (seconds): {holding_col.values()}.')
@@ -87,7 +87,7 @@ def manual_settings():
 
             try:
                 for i in holding_list:
-                    holding_col['holding_time'].append(float(i))
+                    holding_col['holding_time'].append(int(i))
             except ValueError:
                 print('Please use numbers.')
 
