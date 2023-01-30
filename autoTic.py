@@ -28,53 +28,60 @@ def shutdown():
 
 
 # Load in settings
+
+
 def load_settings():
+
     variable_csv = r'run_parameters.csv'
 
     with open(variable_csv, encoding='utf-8-sig') as csvfile:
         reader = csv.DictReader(csvfile)
+
+        global velocity_col
+        global holding_col
 
         velocity_col = {'target_velocities': []}
         holding_col = {'holding_time': []}
 
         for record in reader:
             velocity_col['target_velocities'].append(
-                record['target_velocities'])
-            holding_col['holding_time'].append(record['holding_time'])
-    return velocity_col, holding_col
+                int(record['target_velocities']))
+            holding_col['holding_time'].append(float(record['holding_time']))
+
+    print(f'Target Velocities: {velocity_col.values()}')
+    print(f'Holding Times (seconds): {holding_col.values()}.')
 
 # Enter settings manually
 
 
 def manual_settings():
+    global velocity_col
+    global holding_col
+
     velocity_col = {'target_velocities': []}
     holding_col = {'holding_time': []}
 
     while True:
         try:
-            velocity_input = float(
-                input("Enter target velocities (pulses/ 10,000 seconds): "))
-            print('Please enter a list separated by a space')
-            print("\n")
+            velocity_input = input('Enter target velocities (pulses/ 10,000 seconds): \n '
+                                   'Please enter a list separated by a space \n')
 
             velocity_list = velocity_input.split()
 
             try:
                 for i in velocity_list:
-                    velocity_col['target_velocities'].append(float(i))
+                    velocity_col['target_velocities'].append(int(i))
             except ValueError:
                 print('Please use numbers.')
 
         finally:
-            print(f'Target Velocities: {velocity_col}')
+            print(f'Target Velocities: {velocity_col.values()}')
             break
 
     while True:
         try:
-            holding_input = float(
-                input("Holding times for target velocities (secs):"))
-            print('Please enter a list separated by a space')
-            print("\n")
+            holding_input = input('Holding times for target velocities (secs): \n '
+                                  'Please enter a list separated by a space \n')
 
             holding_list = holding_input.split()
 
@@ -85,9 +92,8 @@ def manual_settings():
                 print('Please use numbers.')
 
         finally:
-            print(f'Holding Times (seconds): {holding_col}.')
+            print(f'Holding Times (seconds): {holding_col.values()}.')
             break
-    return velocity_col, holding_col
 
 # Retrieve current timestamp in %d-%m-%Y, %H:%M:%S format
 
@@ -102,10 +108,10 @@ def current_time():
 
 
 def handler(signum, frame):
-    msg = "Ctrl-c was pressed. Do you really want to exit? y/n "
+    msg = "Ctrl-c was pressed. Do you really want to exit? Y/N \n"
     print(msg, end="", flush=True)
     res = readchar.readchar()
-    if res == 'y':
+    if res == 'y' or res == 'Y':
         print("Shutting down motor...")
         shutdown()
         exit(1)
@@ -141,16 +147,17 @@ while True:
 while True:
     try:
         endPrompt = input(
-            'Import run parameters (p) or enter manually (m)? Enter p or m.  ')
+            'Import run parameters (I) or enter manually (M)? Enter I or M. \n')
     except ValueError:
         print('Incorrect input')
     finally:
-        if endPrompt == 'P' or endPrompt == 'p':
+        if endPrompt == 'I' or endPrompt == 'i':
             print("Importing from run_parameters.csv")
             load_settings()
             break
         elif endPrompt == 'M' or endPrompt == 'm':
             manual_settings()
+            break
         else:
             print('Incorrect input')
 
@@ -163,16 +170,9 @@ tic.halt_and_set_position(0)
 # Energize Motor
 start()
 
-# Show configuration
-print(f'Target Velocity: {tic.variables.target_velocity}')
-print(f'Target Position: {tic.variables.target_position}')
-print(f'Current Velocity: {tic.variables.current_velocity}')
-print(f'Current Position: {tic.variables.current_position}')
-print(f'Planning Mode: {tic.variables.planning_mode}')
-
 while True:
     try:
-        endPrompt = input('Begin run? Y/N  ')
+        endPrompt = input('Begin run? Y/N \n')
     except ValueError:
         print('Incorrect input')
     finally:
@@ -185,7 +185,7 @@ while True:
             print('Incorrect input')
 
 # Create new document to store time and velocity information
-with open(f'sediment experiment core {core_name} {current_time().date()}', 'a', newline='') as output_file:
+with open(f'sediment experiment core {core_name} {current_time().date()}.txt', 'a', newline='') as output_file:
 
     # Write header information to document
     output_writer = csv.writer(output_file, delimiter='\t')
@@ -193,8 +193,10 @@ with open(f'sediment experiment core {core_name} {current_time().date()}', 'a', 
     output_writer.writerow([f'User: {os.getlogin()}'])
     output_writer.writerow([f'Tic Device: {tic.settings.product}'])
     output_writer.writerow([f'Tic Serial Number: {serialNums[0]}'])
-    output_writer.writerow([f'Target Velocities: {velocity_col.values()}'])
-    output_writer.writerow([f'Holding Time: {holding_col.values()}'])
+    output_writer.writerow(
+        [f'Target Velocities: {list(velocity_col.values())}'])
+    output_writer.writerow([f'Holding Times: {list(holding_col.values())}'])
+    output_writer.writerow('')
     output_writer.writerow(['<<<Begin Data Collection>>>'])
     output_writer.writerow(['time', 'current_velocity'])
 
@@ -211,7 +213,7 @@ with open(f'sediment experiment core {core_name} {current_time().date()}', 'a', 
                 for t in range(holding_time, 0, -1):
                     time.sleep(1)
                     sys.stdout.write(
-                        f'Current velocity: {i}     Time to velocity change: {t} seconds')
+                        f'Current velocity: {i}     Current time: {current_time()}    Time to velocity change: {t} seconds \n')
                     # Clear printed line
                     sys.stdout.flush()
                     # Write current time and velocity to output file
