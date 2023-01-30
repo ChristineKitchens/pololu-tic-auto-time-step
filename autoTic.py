@@ -70,6 +70,7 @@ def get_target_velocities():
     while True:
         try:
             velocity_input = input('Enter target velocities (microsteps/ 10,000 seconds): \n '
+
                                    'Please enter a list separated by a space \n')
 
             velocity_list = velocity_input.split()
@@ -143,7 +144,9 @@ signal.signal(signal.SIGINT, handler)
 for dev in libusb_package.find(find_all=True):
     print(dev)
 
+
 tic = TicUSB()
+
 
 # - Configure Run Parameters ---------------------------------
 
@@ -203,6 +206,7 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
     output_writer.writerow([f'User: {os.getlogin()}'])
     output_writer.writerow([f'Tic Device: TIC-T500'])
     output_writer.writerow([f'Tic Serial Number: 00387558'])
+
     output_writer.writerow(
         [f'Target Velocities: {list(velocity_col.values())}'])
     output_writer.writerow([f'Holding Times: {list(holding_col.values())}'])
@@ -220,6 +224,7 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
             counter += 1
             # Maintain current velocity for pre-determined holding time
             while tic.get_current_velocity() != tic.get_target_velocity():
+
                 for t in range(holding_time, 0, -1):
                     time.sleep(1)
                     sys.stdout.write(
@@ -229,6 +234,7 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
                     # Write current time and velocity to output file
                     output_writer.writerow(
                         [f'{current_time()}', f'{tic.get_current_velocity()}'])
+
 
     # De-energize motor and get error status
     while True:
