@@ -26,6 +26,69 @@ def shutdown():
     print('Deenergizing motor...')
     print(tic.variables.error_status)
 
+
+# Load in settings
+def load_settings():
+    variable_csv = r'run_parameters.csv'
+
+    with open(variable_csv, encoding='utf-8-sig') as csvfile:
+        reader = csv.DictReader(csvfile)
+
+        velocity_col = {'target_velocities': []}
+        holding_col = {'holding_time': []}
+
+        for record in reader:
+            velocity_col['target_velocities'].append(
+                record['target_velocities'])
+            holding_col['holding_time'].append(record['holding_time'])
+    return velocity_col, holding_col
+
+# Enter settings manually
+
+
+def manual_settings():
+    velocity_col = {'target_velocities': []}
+    holding_col = {'holding_time': []}
+
+    while True:
+        try:
+            velocity_input = float(
+                input("Enter target velocities (pulses/ 10,000 seconds): "))
+            print('Please enter a list separated by a space')
+            print("\n")
+
+            velocity_list = velocity_input.split()
+
+            try:
+                for i in velocity_list:
+                    velocity_col['target_velocities'].append(float(i))
+            except ValueError:
+                print('Please use numbers.')
+
+        finally:
+            print(f'Target Velocities: {velocity_col}')
+            break
+
+    while True:
+        try:
+            holding_input = float(
+                input("Holding times for target velocities (secs):"))
+            print('Please enter a list separated by a space')
+            print("\n")
+
+            holding_list = holding_input.split()
+
+            try:
+                for i in holding_list:
+                    holding_col['holding_time'].append(float(i))
+            except ValueError:
+                print('Please use numbers.')
+
+        finally:
+            print(f'Holding Times (seconds): {holding_col}.')
+            break
+    return velocity_col, holding_col
+
 # Retrieve current timestamp in %d-%m-%Y, %H:%M:%S format
 
 
@@ -44,6 +107,7 @@ def handler(signum, frame):
     res = readchar.readchar()
     if res == 'y':
         print("Shutting down motor...")
+        shutdown()
         exit(1)
     else:
         print("", end="\r", flush=True)
@@ -65,42 +129,33 @@ tic.connect_to_serial_number(serial_number=serialNums[0])
 tic.settings.load_config("config.yml")
 tic.settings.apply()
 
-# - Load in Settings -----------------------------------------
+# - Configure Run Parameters ---------------------------------
 
-variable_csv = r'run_parameters.csv'
+while True:
+    try:
+        core_name = input("Enter core name: ")
+    finally:
+        print(f'Core id: {core_name}')
+        break
 
-with open(variable_csv, encoding='utf-8-sig') as csvfile:
-    reader = csv.DictReader(csvfile)
-
-    velocity_col = {'target_velocities': []}
-    holding_col = {'holding_time': []}
-
-    for record in reader:
-        velocity_col['target_velocities'].append(record['target_velocities'])
-        holding_col['holding_time'].append(record['holding_time'])
-
-
-# - Configure Run --------------------------------------------
-# while True:
-#     try:
-#         maxSpeed = float(
-#             input("Enter target velocities: "))
-#         print(f'Max speed: {maxSpeed}')
-#         break
-#     except ValueError:
-#         print('Please enter a number.')
-
-# while True:
-#     try:
-#         totalTimePeriod = float(
-#             input("Holding time for target velocities (secs):"))
-#         print(f'Holding Time: {totalTimePeriod} seconds.')
-#         break
-#     except ValueError:
-#         print('Please enter a number.')
+while True:
+    try:
+        endPrompt = input(
+            'Import run parameters (p) or enter manually (m)? Enter p or m.  ')
+    except ValueError:
+        print('Incorrect input')
+    finally:
+        if endPrompt == 'P' or endPrompt == 'p':
+            print("Importing from run_parameters.csv")
+            load_settings()
+            break
+        elif endPrompt == 'M' or endPrompt == 'm':
+            manual_settings()
+        else:
+            print('Incorrect input')
 
 
-# - Motion Command Sequence ----------------------------------
+# - Commence Run ---------------------------------------------
 
 # Zero current motor position
 tic.halt_and_set_position(0)
@@ -115,8 +170,23 @@ print(f'Current Velocity: {tic.variables.current_velocity}')
 print(f'Current Position: {tic.variables.current_position}')
 print(f'Planning Mode: {tic.variables.planning_mode}')
 
+while True:
+    try:
+        endPrompt = input('Begin run? Y/N  ')
+    except ValueError:
+        print('Incorrect input')
+    finally:
+        if endPrompt == 'Y' or endPrompt == 'y':
+            print("Starting run...")
+            break
+        elif endPrompt == 'N' or endPrompt == 'n':
+            print('Take your time :)')
+        else:
+            print('Incorrect input')
+
 # Create new document to store time and velocity information
-with open(f'sediment_experiment_{time.time()}', 'a', newline='') as output_file:
+with open(f'sediment experiment core {core_name} {current_time().date()}', 'a', newline='') as output_file:
+
     # Write header information to document
     output_writer = csv.writer(output_file, delimiter='\t')
     output_writer.writerow([f'Date: {current_time()}'])
@@ -128,16 +198,20 @@ with open(f'sediment_experiment_{time.time()}', 'a', newline='') as output_file:
     output_writer.writerow(['<<<Begin Data Collection>>>'])
     output_writer.writerow(['time', 'current_velocity'])
 
+    counter = 0
+
     # Iterate through list of target velocities
     for key, value in velocity_col.items():
         for i in value:
-            print(i)
             tic.set_target_velocity(int(i))
+            holding_time = int(holding_col['holding_time'][counter])
+            counter += 1
             # Maintain current velocity for pre-determined holding time
             while tic.variables.current_velocity != tic.variables.target_velocity:
-                for t in range(int(holding_col['holding_time'][0]), 0, -1):
+                for t in range(holding_time, 0, -1):
                     time.sleep(1)
-                    sys.stdout.write(f'Time to velocity change: {t} seconds')
+                    sys.stdout.write(
+                        f'Current velocity: {i}     Time to velocity change: {t} seconds')
                     # Clear printed line
                     sys.stdout.flush()
                     # Write current time and velocity to output file
@@ -152,10 +226,10 @@ with open(f'sediment_experiment_{time.time()}', 'a', newline='') as output_file:
             print('Incorrect input')
         finally:
             if endPrompt == 'Y' or endPrompt == 'y':
-                print("Shutting down motor...")
+                print('Shutting down motor...')
                 shutdown()
                 break
             elif endPrompt == 'N' or endPrompt == 'n':
-                print("Use your spiral power!")
+                print('Use your spiral power!')
             else:
                 print('Incorrect input')
