@@ -178,9 +178,6 @@ while True:
 
 # - Commence Run ---------------------------------------------
 
-# Zero current motor position
-tic.halt_and_set_position(0)
-
 # Energize Motor
 start()
 
