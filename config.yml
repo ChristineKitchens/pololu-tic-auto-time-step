@@ -4,24 +4,23 @@ tic_settings: # required header for load_config fcn.
     decay_mode: TIC_DECAY_MODE_T500_AUTO
     control_mode: TIC_CONTROL_MODE_SERIAL
     never_sleep: False
-    disable_safe_start: True 
-    ignore_err_line_high: False 
-    auto_clear_driver_error: True 
-    soft_error_response: TIC_RESPONSE_DECEL_TO_HOLD 
-    soft_error_position: 0 
+    disable_safe_start: True
+    ignore_err_line_high: False
+    auto_clear_driver_error: True
+    soft_error_response: TIC_RESPONSE_DECEL_TO_HOLD
+    soft_error_position: 0
     serial_baud_rate: 9600
     serial_crc_enabled: False
     serial_device_number: 14
     serial_alt_device_number: 0
     serial_enable_alt_device_number: False
     serial_14bit_device_number: False
-    command_timeout: 1000
+    command_timeout: 0
     serial_crc_for_commands: False
     serial_crc_for_responses: False
     serial_7bit_responses: False
     serial_response_delay: 0
     vin_calibration: 0
-    ignore_err_line_high: True
     input_averaging_enabled: True
     input_hysteresis: 0
     input_scaling_degree: 0
@@ -32,7 +31,7 @@ tic_settings: # required header for load_config fcn.
     input_max: 4095
     output_min: -200
     output_max: 200
-    encoder_prescaler: 1 
+    encoder_prescaler: 1
     encoder_postscaler: 1
     encoder_unlimited: False
     scl_config: 0
@@ -44,7 +43,7 @@ tic_settings: # required header for load_config fcn.
     max_speed: 200000000
     starting_speed: 0
     max_accel: 40000
-    max_decel: 0
+    max_decel: 40000
     current_limit: 1982
     current_limit_during_error: -1
     auto_homing: False
