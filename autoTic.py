@@ -55,11 +55,16 @@ def load_settings():
 
 
 def manual_settings():
+    get_target_velocities()
+    get_holding_times()
+
+# Get user input for target velocities
+
+
+def get_target_velocities():
     global velocity_col
-    global holding_col
 
     velocity_col = {'target_velocities': []}
-    holding_col = {'holding_time': []}
 
     while True:
         try:
@@ -75,8 +80,16 @@ def manual_settings():
                 print('Please use numbers.')
 
         finally:
-            print(f'Target Velocities: {velocity_col.values()}')
+            print(f'Target Velocities: {list(velocity_col.values())}')
             break
+
+# Get user input for holding times
+
+
+def get_holding_times():
+    global holding_col
+
+    holding_col = {'holding_time': []}
 
     while True:
         try:
@@ -92,7 +105,7 @@ def manual_settings():
                 print('Please use numbers.')
 
         finally:
-            print(f'Holding Times (seconds): {holding_col.values()}.')
+            print(f'Holding Times (seconds): {list(holding_col.values())}.')
             break
 
 # Retrieve current timestamp in %d-%m-%Y, %H:%M:%S format
@@ -108,6 +121,7 @@ def current_time():
 
 
 def handler(signum, frame):
+    print('\n')
     msg = "Ctrl-c was pressed. Do you really want to exit? Y/N \n"
     print(msg, end="", flush=True)
     res = readchar.readchar()
