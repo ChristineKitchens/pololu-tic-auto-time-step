@@ -2,10 +2,10 @@
 Script that automates incremental increases in velocity based on user inputs. This program builds upon scripts in the [Pololu-Tic-Software Github](https://github.com/pololu/pololu-tic-software) and [ticlib Github](https://github.com/jphalip/ticlib).
 
 # Prerequisites
-Requires [Tic Software and Drivers for Windows](https://www.pololu.com/file/0J1325/pololu-tic-1.8.2-win.msi) provided by Pololu to be installed. Also requires installation of [ticlib Python wrapper](https://github.com/jphalip/ticlib). Navigate to the directory containing the repo and install the dependencies using the following command:
+Requires [Tic Software and Drivers for Windows](https://www.pololu.com/file/0J1325/pololu-tic-1.8.2-win.msi) provided by Pololu to be installed. Also requires installation of [ticlib Python wrapper](https://github.com/jphalip/ticlib). Install the dependencies using the following command:
 
 ```
-pip install -r requirements.txt
+pip install -r //path//to//requirements.txt
 ```
 # Script Use
 ## 1. Update Settings via Pololu Tic Control Center
@@ -78,6 +78,11 @@ Entering Y will shutdown the motor and exit the program. Again, note that pressi
 The generated .txt file should look similar to the [example](sediment%20experiment%20core%20C%202023-01-30.txt) file in this repo:
 
 ![output_file.png](resources/output_file.png)
+
+# Troubleshooting
+Issue | Solutions 
+--- | --- 
+Error Message: `usb.core.USBError: [Errno 13] Access denied (insufficient permissions)` | TBD 
 
 # External Resources
 - [logging Library](https://docs.python.org/3/library/logging.html)
