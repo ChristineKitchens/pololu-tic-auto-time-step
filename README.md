@@ -82,7 +82,8 @@ The generated .txt file should look similar to the [example](sediment%20experime
 # Troubleshooting
 Issue | Solutions 
 --- | --- 
-Error Message: `usb.core.USBError: [Errno 13] Access denied (insufficient permissions)` | TBD 
+Error Message: `usb.core.USBError: [Errno 13] Access denied (insufficient permissions)` | The PyUSB and libusb_package dependencies require write access to USB nodes. If the user account is not an administrative or root user, they are unlikely to have these permissions by default. Please contact IT services to have the user added to a group with write access to USB nodes.
+Error Message: `'ticlib.py, line 636, in __init__ raise Exception('USB device not found') Exception: USB device not found'` | Confirm that tic USB is plugged into computer and power source is plugged in.
 
 # External Resources
 - [logging Library](https://docs.python.org/3/library/logging.html)

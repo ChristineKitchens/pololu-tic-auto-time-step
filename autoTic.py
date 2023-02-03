@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+from datetime import timedelta
 import libusb_package
 import os
 import signal
@@ -49,8 +50,8 @@ def load_settings():
                 int(record['target_velocities']))
             holding_col['holding_time'].append(int(record['holding_time']))
 
-    print(f'Target Velocities: {velocity_col.values()}')
-    print(f'Holding Times (seconds): {holding_col.values()}.')
+    print(f'Target Velocities: {list(velocity_col.values())[:10]}')
+    print(f'Holding Times (seconds): {list(holding_col.values())[:10]}.')
 
 # Enter settings manually
 
@@ -82,7 +83,7 @@ def get_target_velocities():
                 print('Please use numbers.')
 
         finally:
-            print(f'Target Velocities: {list(velocity_col.values())}')
+            print(f'Target Velocities: {list(velocity_col.values()[:10])}')
             break
 
 # Get user input for holding times
@@ -107,7 +108,8 @@ def get_holding_times():
                 print('Please use numbers.')
 
         finally:
-            print(f'Holding Times (seconds): {list(holding_col.values())}.')
+            print(
+                f'Holding Times (seconds): {list(holding_col.values()[:10])}.')
             break
 
 # Retrieve current timestamp in %d-%m-%Y, %H:%M:%S format
@@ -208,32 +210,41 @@ with open(f'sediment experiment core {core_name} {current_time().date()}.txt', '
     output_writer.writerow([f'Tic Serial Number: 00387558'])
 
     output_writer.writerow(
-        [f'Target Velocities: {list(velocity_col.values())}'])
-    output_writer.writerow([f'Holding Times: {list(holding_col.values())}'])
+        [f'Target Velocities: {list(velocity_col.values()[:10])}'])
+    output_writer.writerow(
+        [f'Holding Times: {list(holding_col.values()[:10])}'])
     output_writer.writerow('')
     output_writer.writerow(['<<<Begin Data Collection>>>'])
     output_writer.writerow(['time', 'current_velocity'])
 
+    total_run_time = sum(holding_col['holding_time'])
+    run_time_counter = 0
     counter = 0
+ 
 
     # Iterate through list of target velocities
     for key, value in velocity_col.items():
         for i in value:
             tic.set_target_velocity(i)
             holding_time = int(holding_col['holding_time'][counter])
-            counter += 1
+            
             # Maintain current velocity for pre-determined holding time
             while tic.get_current_velocity() != tic.get_target_velocity():
-
+                            
                 for t in range(holding_time, 0, -1):
                     time.sleep(1)
+                    remaining_run_time = timedelta(seconds = total_run_time-run_time_counter)
                     sys.stdout.write(
-                        f'Current velocity: {i}     Current time: {current_time()}    Time to velocity change: {t} seconds \n')
+                        f'Current velocity: {i}     Current time: {current_time()}    Time to velocity change: {t} seconds  Time to run end: {remaining_run_time} \n')
                     # Clear printed line
                     sys.stdout.flush()
                     # Write current time and velocity to output file
                     output_writer.writerow(
                         [f'{current_time()}', f'{tic.get_current_velocity()}'])
+                    
+                    run_time_counter += 1
+            
+            counter += 1
 
     # De-energize motor and get error status
     while True:

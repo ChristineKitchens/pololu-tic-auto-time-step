@@ -1,6 +1,6 @@
-libusb_package==1.0.26.1
-readchar==4.0.3
-ticlib==0.2.2
+libusb_package
+readchar
+ticlib
 pyusb
 csv
 datetime
