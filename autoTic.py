@@ -1,8 +1,8 @@
 import csv
 from datetime import datetime
 from datetime import timedelta
-from itertools import batched
-from itertools import islice
+# from itertools import batched
+# from itertools import islice
 import libusb_package
 import os
 import signal
@@ -28,7 +28,6 @@ def shutdown():
     tic.enter_safe_start()
     tic.deenergize()
     print('Deenergizing motor...')
-    print(tic.variables.error_status)
 
 
 # Load in settings
@@ -50,7 +49,7 @@ def load_settings():
         for record in reader:
             velocity_col['target_velocities'].append(
                 int(record['target_velocities']))
-            holding_col['holding_time'].append(int(record['holding_time']))
+            holding_col['holding_time'].append(float(record['holding_time']))
 
     print(f'Target Velocities: {list(velocity_col.values())}')
     print(f'Holding Times (seconds): {list(holding_col.values())}.')
@@ -58,9 +57,9 @@ def load_settings():
 # Split target velocities and/or holding times into smaller batches
 
 
-def split_imported_data(x):
-    for batch in batched(list(x.values()), 10):
-        print(batch)
+# def split_imported_data(x):
+#     for batch in batched(list(x.values()), 10):
+#         print(batch)
 
 # Enter settings manually
 
@@ -92,7 +91,7 @@ def get_target_velocities():
                 print('Please use numbers.')
 
         finally:
-            print(f'Target Velocities: {list(velocity_col.values()[:10])}')
+            print(f'Target Velocities: {list(velocity_col.values())}')
             break
 
 # Get user input for holding times
@@ -118,7 +117,7 @@ def get_holding_times():
 
         finally:
             print(
-                f'Holding Times (seconds): {list(holding_col.values()[:10])}.')
+                f'Holding Times (seconds): {list(holding_col.values())}.')
             break
 
 # Retrieve current timestamp in %d-%m-%Y, %H:%M:%S format
@@ -163,9 +162,37 @@ tic = TicUSB()
 
 while True:
     try:
+        project_name = input("Enter project name: ")
+    finally:
+        print(f'Project: {project_name}')
+        break
+
+while True:
+    try:
         core_name = input("Enter core name: ")
     finally:
         print(f'Core id: {core_name}')
+        break
+
+while True:
+    try:
+        replicate_id = input("Enter replicate ID: ")
+    finally:
+        print(f'Replicate: {replicate_id}')
+        break
+
+while True:
+    try:
+        material_name = input("Enter material (e.g. marine sand): ")
+    finally:
+        print(f'Material: {material_name}')
+        break
+
+while True:
+    try:
+        size_fraction = input("Enter size fraction: ")
+    finally:
+        print(f'Size fraction: {size_fraction}')
         break
 
 while True:
@@ -209,7 +236,7 @@ while True:
             print('Incorrect input')
 
 # Create new document to store time and velocity information
-with open(f'sediment experiment core {core_name} {current_time().date()}.txt', 'a', newline='') as output_file:
+with open(f'{project_name}_{current_time().date().strftime("%Y%m%d")}_{material_name}_{size_fraction}_{replicate_id}.txt', 'a', newline='') as output_file:
 
     # Write header information to document
     output_writer = csv.writer(output_file, delimiter='\t')
